@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMARAVASSAM | Space Settlement Command Center</title>
+  <style>
+    /* RESET & FUTURISTIC SPACE THEME */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #070913; color: #e0e6ed; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    .hidden { display: none !important; }
+
+    /* LOGIN MODAL OVERLAY */
+    .overlay {
+      position: fixed; inset: 0; background: radial-gradient(circle at center, #13172e 0%, #030408 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .login-card {
+      background: rgba(18, 24, 43, 0.85); border: 1px solid #00d4ff; border-radius: 12px;
+      padding: 35px; width: 340px; text-align: center; box-shadow: 0 0 25px rgba(0, 212, 255, 0.25);
+      backdrop-filter: blur(10px);
+    }
+    .login-card h2 { color: #00d4ff; margin-bottom: 5px; font-size: 1.4rem; letter-spacing: 2px; }
+    .login-card p { color: #7f8c8d; margin-bottom: 20px; font-size: 0.85rem; }
+    .input-field {
+      width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0e1a; border: 1px solid #232d4b;
+      color: #fff; border-radius: 6px; outline: none; transition: border 0.3s;
+    }
+    .input-field:focus { border-color: #00d4ff; }
+    .btn-primary {
+      width: 100%; padding: 12px; background: #00d4ff; border: none; color: #070913;
+      font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s ease;
+    }
+    .btn-primary:hover { background: #009ac2; color: #fff; }
+    .error-msg { color: #ff4757; font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 30px; background: #0e1222; border-bottom: 1px solid #1c2442;
+    }
+    .logo { font-size: 1.2rem; font-weight: bold; color: #00d4ff; letter-spacing: 1px; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+    .badge-leader { background: #ff4757; color: #fff; }
+    .badge-member { background: #2ed573; color: #000; }
+    .btn-small { padding: 6px 12px; background: #232d4b; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
+    .btn-small:hover { background: #ff4757; }
+
+    /* DASHBOARD CONTENT */
+    .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
+    
+    /* NAV BUTTONS GRID */
+    .nav-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .action-card {
+      background: #0e1222; border: 1px solid #1c2442; padding: 20px; border-radius: 8px;
+      text-align: center; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: inherit;
+    }
+    .action-card:hover { border-color: #00d4ff; transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,212,255,0.15); }
+    .action-card h3 { font-size: 1rem; color: #00d4ff; margin-bottom: 5px; }
+    .action-card p { font-size: 0.75rem; color: #a0a5c0; }
+
+    /* MAIN CONTENT PANELS */
+    .panel { background: #0e1222; border: 1px solid #1c2442; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+    .panel h2 { color: #00d4ff; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #1c2442; padding-bottom: 8px; }
+
+    /* ADMIN & ADD PERSON STYLES */
+    .admin-panel { border-color: #ff4757; background: rgba(255, 71, 87, 0.03); }
+    .admin-panel h2 { color: #ff4757; border-bottom-color: rgba(255, 71, 87, 0.3); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; }
+    
+    /* SCHEDULE & ROSTER TABLES */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1c2442; }
+    th { color: #00d4ff; }
+
+    /* PROGRESS BAR */
+    .progress-item { margin-bottom: 12px; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px; }
+    .progress-track { width: 100%; height: 8px; background: #1c2442; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #00d4ff; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN OVERLAY -->
+  <div id="login-screen" class="overlay">
+    <div class="login-card">
+      <h2>AMARAVASSAM</h2>
+      <p>NSS Space Settlement Portal</p>
+      <input type="text" id="login-name" class="input-field" placeholder="Enter Name">
+      <input type="password" id="login-pass" class="input-field" placeholder="Enter Password">
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+      <div id="login-error" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN APP DASHBOARD -->
+  <div id="app-content" class="hidden">
+    
+    <header class="navbar">
+      <div class="logo">🚀 AMARAVASSAM COMMAND CENTER</div>
+      <div class="user-info">
+        <span id="user-display">Name</span>
+        <span id="user-role-badge" class="badge">Role</span>
+        <button class="btn-small" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <div class="container">
+
+      <!-- QUICK ACTION BUTTONS -->
+      <div class="nav-actions">
+        <div class="action-card" onclick="openPdfViewer()">
+          <h3>📄 Space Settlement PDF</h3>
+          <p>Read official contest submission</p>
+        </div>
+        
+        <div class="action-card" id="google-docs-card" onclick="openGoogleDocs()">
+          <h3>✏️ Edit in Google Docs</h3>
+          <p>Live collaborative editing</p>
+        </div>
+
+        <div class="action-card" onclick="scrollToSection('schedule-section')">
+          <h3>📅 Contest Schedule</h3>
+          <p>Deadlines & meeting milestones</p>
+        </div>
+
+        <div class="action-card" onclick="scrollToSection('models-section')">
+          <h3>🧊 3D Tinkercad Models</h3>
+          <p>View interactive CAD renders</p>
+        </div>
+      </div>
+
+      <!-- 3. ADMIN PANEL (VISIBLE TO LEADER ONLY) -->
+      <div id="admin-panel" class="panel admin-panel hidden">
+        <h2>👑 Leader Command Panel: Add Team Member</h2>
+        <div class="form-grid">
+          <input type="text" id="new-user-name" class="input-field" placeholder="Person's Name" style="margin:0;">
+          <input type="password" id="new-user-pass" class="input-field" placeholder="Set Password" style="margin:0;">
+          <button class="btn-primary" style="background:#ff4757; color:#fff;" onclick="addPerson()">Add Person</button>
+        </div>
+        <div id="admin-msg" class="error-msg" style="color:#2ed573;"></div>
+      </div>
+
+      <!-- 4. SCHEDULE & MILESTONES -->
+      <div id="schedule-section" class="panel">
+        <h2>📅 Project Schedule & Deadlines</h2>
+        <table id="schedule-table">
+          <thead>
+            <tr>
+              <th>Task / Milestone</th>
+              <th>Assigned To</th>
+              <th>Deadline</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Life Support & Agriculture Draft</td>
+              <td>Team</td>
+              <td>Oct 15, 2026</td>
+              <td><span style="color:#eccc68;">In Progress</span></td>
+            </tr>
+            <tr>
+              <td>Tinkercad 3D Hull Render</td>
+              <td>Leader</td>
+              <td>Nov 01, 2026</td>
+              <td><span style="color:#2ed573;">Completed</span></td>
+            </tr>
+            <tr>
+              <td>Final PDF Submission to NSS</td>
+              <td>All Members</td>
+              <td>Dec 10, 2026</td>
+              <td><span style="color:#ff4757;">Upcoming</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 5. CHAPTER PROGRESS TRACKER -->
+      <div class="panel">
+        <h2>📊 Chapter Progress</h2>
+        <div class="progress-item">
+          <div class="progress-labels"><span>Executive Summary & Structural Design</span><span>90%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width: 90%;"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-labels"><span>Life Support & Artificial Gravity</span><span>70%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width: 70%;"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-labels"><span>Space Agriculture & Energy Systems</span><span>50%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
+        </div>
+      </div>
+
+      <!-- 6. 3D MODELS SECTION -->
+      <div id="models-section" class="panel">
+        <h2>🧊 3D Settlement CAD Views</h2>
+        <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Interactive Tinkercad embeds and station layout schematics.</p>
+        <div style="background:#070913; border:1px dashed #1c2442; height:200px; display:flex; align-items:center; justify-content:center; color:#7f8c8d; border-radius:6px;">
+          [ Embedded Tinkercad 3D Viewer Canvas ]
+        </div>
+      </div>
+
+      <!-- 7. REGISTERED TEAM ROSTER -->
+      <div class="panel">
+        <h2>👥 Team Roster</h2>
+        <table id="roster-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Access Level</th>
+            </tr>
+          </thead>
+          <tbody id="roster-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // DEFAULT ACCOUNTS DATA
+    const usersDatabase = [
+      { name: "Leader", pass: "admin123", role: "Leader" },
+      { name: "Member", pass: "space123", role: "Team Member" }
+    ];
+
+    // REPLACE THESE WITH YOUR ACTUAL GOOGLE DOCS / DRIVE LINKS
+    const GOOGLE_DOCS_URL = "https://docs.google.com/"; 
+    const PDF_VIEW_URL = "https://docs.google.com/viewer"; 
+
+    let currentUser = null;
+
+    // LOGIN SYSTEM
+    function handleLogin() {
+      const nameInput = document.getElementById("login-name").value.trim();
+      const passInput = document.getElementById("login-pass").value.trim();
+      const errorDiv = document.getElementById("login-error");
+
+      const foundUser = usersDatabase.find(
+        u => u.name.toLowerCase() === nameInput.toLowerCase() && u.pass === passInput
+      );
+
+      if (foundUser) {
+        currentUser = foundUser;
+        errorDiv.innerText = "";
+        initializeDashboard();
+      } else {
+        errorDiv.innerText = "Invalid Name or Password.";
+      }
+    }
+
+    // INITIALIZE DASHBOARD PANELS
+    function initializeDashboard() {
+      document.getElementById("login-screen").classList.add("hidden");
+      document.getElementById("app-content").classList.remove("hidden");
+
+      document.getElementById("user-display").innerText = currentUser.name;
+      const badge = document.getElementById("user-role-badge");
+      const adminPanel = document.getElementById("admin-panel");
+
+      if (currentUser.role === "Leader") {
+        badge.innerText = "PROJECT LEADER";
+        badge.className = "badge badge-leader";
+        adminPanel.classList.remove("hidden");
+      } else {
+        badge.innerText = "TEAM MEMBER";
+        badge.className = "badge badge-member";
+        adminPanel.classList.add("hidden");
+      }
+
+      renderRoster();
+    }
+
+    // ADMIN: ADD PERSON FUNCTION
+    function addPerson() {
+      const name = document.getElementById("new-user-name").value.trim();
+      const pass = document.getElementById("new-user-pass").value.trim();
+      const msg = document.getElementById("admin-msg");
+
+      if (!name || !pass) {
+        msg.style.color = "#ff4757";
+        msg.innerText = "Please enter both name and password.";
+        return;
+      }
+
+      usersDatabase.push({ name: name, pass: pass, role: "Team Member" });
+      
+      document.getElementById("new-user-name").value = "";
+      document.getElementById("new-user-pass").value = "";
+      
+      msg.style.color = "#2ed573";
+      msg.innerText = `Successfully added ${name} to team accounts!`;
+      
+      renderRoster();
+    }
+
+    // RENDER TEAM ROSTER
+    function renderRoster() {
+      const tbody = document.getElementById("roster-body");
+      tbody.innerHTML = "";
+      usersDatabase.forEach(u => {
+        const row = `<tr>
+          <td>${u.name}</td>
+          <td>${u.role}</td>
+          <td><span style="color:${u.role === 'Leader' ? '#ff4757' : '#2ed573'};">${u.role === 'Leader' ? 'Full Control' : 'Standard View'}</span></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    // BUTTON NAVIGATION ACTIONS
+    function openPdfViewer() {
+      window.open(PDF_VIEW_URL, '_blank');
+    }
+
+    function openGoogleDocs() {
+      window.open(GOOGLE_DOCS_URL, '_blank');
+    }
+
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById("login-name").value = "";
+      document.getElementById("login-pass").value = "";
+      document.getElementById("app-content").classList.add("hidden");
+      document.getElementById("login-screen").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
