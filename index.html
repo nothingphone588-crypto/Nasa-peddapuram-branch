@@ -55,7 +55,7 @@
     .nav-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
     .action-card {
       background: #0e1222; border: 1px solid #1c2442; padding: 20px; border-radius: 8px;
-      text-align: center; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: inherit;
+      text-align: center; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: inherit; display: block;
     }
     .action-card:hover { border-color: #00d4ff; transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,212,255,0.15); }
     .action-card h3 { font-size: 1rem; color: #00d4ff; margin-bottom: 5px; }
@@ -112,15 +112,16 @@
 
       <!-- QUICK ACTION BUTTONS -->
       <div class="nav-actions">
-        <div class="action-card" onclick="scrollToSection('doc-section')">
-          <h3>📄 Code File / Document</h3>
-          <p>Read official project code & files</p>
-        </div>
+        <!-- Direct Link to your Google Doc -->
+        <a id="code-file-btn" class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
+          <h3>📄 Space Settlement PDF / Doc</h3>
+          <p id="code-file-subtitle">Click to open official Google Doc</p>
+        </a>
         
-        <div class="action-card" id="google-docs-card" onclick="openGoogleDocs()">
+        <a class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
           <h3>✏️ Edit in Google Docs</h3>
           <p>Live collaborative editing</p>
-        </div>
+        </a>
 
         <div class="action-card" onclick="scrollToSection('schedule-section')">
           <h3>📅 Contest Schedule</h3>
@@ -145,25 +146,15 @@
         </div>
         <div id="admin-msg" class="error-msg" style="color:#2ed573; margin-bottom:15px;"></div>
 
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Code File / Document Link</h3>
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Document Link</h3>
         <div class="form-grid" style="grid-template-columns: 1fr auto;">
-          <input type="text" id="code-file-url" class="input-field" placeholder="Paste Google Drive / Docs / GitHub link..." style="margin:0;">
-          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateFileLink()">Set File Link</button>
+          <input type="text" id="code-file-url" class="input-field" placeholder="Paste new Google Docs / Drive link..." style="margin:0;">
+          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateFileLink()">Set Document Link</button>
         </div>
         <div id="file-link-msg" class="error-msg" style="color:#2ed573;"></div>
       </div>
 
-      <!-- 4. DOCUMENT & CODE FILE VIEW SECTION -->
-      <div id="doc-section" class="panel">
-        <h2>📄 Code File & Project Document Viewer</h2>
-        <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Official space settlement code file viewer frame.</p>
-        <iframe id="doc-iframe" src="https://docs.google.com/document/u/0/?tof=true" style="width:100%; height:400px; border:1px solid #1c2442; border-radius:6px; background:#fff;"></iframe>
-        <div style="margin-top:10px;">
-          <a id="direct-doc-link" href="https://docs.google.com/document/" target="_blank" style="color:#00d4ff; font-size:0.85rem; text-decoration:none;">🔗 Open File directly in new tab</a>
-        </div>
-      </div>
-
-      <!-- 5. SCHEDULE & MILESTONES -->
+      <!-- 4. SCHEDULE & MILESTONES -->
       <div id="schedule-section" class="panel">
         <h2>📅 Project Schedule & Deadlines</h2>
         <table id="schedule-table">
@@ -198,7 +189,7 @@
         </table>
       </div>
 
-      <!-- 6. CHAPTER PROGRESS TRACKER -->
+      <!-- 5. CHAPTER PROGRESS TRACKER -->
       <div class="panel">
         <h2>📊 Chapter Progress</h2>
         <div class="progress-item">
@@ -215,7 +206,7 @@
         </div>
       </div>
 
-      <!-- 7. 3D MODELS SECTION -->
+      <!-- 6. 3D MODELS SECTION -->
       <div id="models-section" class="panel">
         <h2>🧊 3D Settlement CAD Views</h2>
         <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Interactive Tinkercad embeds and station layout schematics.</p>
@@ -224,7 +215,7 @@
         </div>
       </div>
 
-      <!-- 8. REGISTERED TEAM ROSTER -->
+      <!-- 7. REGISTERED TEAM ROSTER -->
       <div class="panel">
         <h2>👥 Team Roster</h2>
         <table id="roster-table">
@@ -317,9 +308,9 @@
       renderRoster();
     }
 
-    // ADMIN: UPDATE CODE FILE LINK
+    // ADMIN: UPDATE FILE LINK
     function updateFileLink() {
-      const linkInput = document.getElementById("code-file-url").value.trim();
+      let linkInput = document.getElementById("code-file-url").value.trim();
       const msg = document.getElementById("file-link-msg");
 
       if (!linkInput) {
@@ -328,11 +319,16 @@
         return;
       }
 
-      document.getElementById("doc-iframe").src = linkInput;
-      document.getElementById("direct-doc-link").href = linkInput;
+      if (!linkInput.startsWith("http://") && !linkInput.startsWith("https://")) {
+        linkInput = "https://" + linkInput;
+      }
+
+      const fileBtn = document.getElementById("code-file-btn");
+      fileBtn.href = linkInput;
 
       msg.style.color = "#2ed573";
-      msg.innerText = "Code file / document link updated successfully!";
+      msg.innerText = "Document link updated successfully!";
+      document.getElementById("code-file-subtitle").innerText = "Opens updated document link";
     }
 
     // RENDER TEAM ROSTER
@@ -347,10 +343,6 @@
         </tr>`;
         tbody.innerHTML += row;
       });
-    }
-
-    function openGoogleDocs() {
-      window.open("https://docs.google.com/", '_blank');
     }
 
     function scrollToSection(id) {
