@@ -65,6 +65,22 @@
     .panel { background: #0e1222; border: 1px solid #1c2442; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
     .panel h2 { color: #00d4ff; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #1c2442; padding-bottom: 8px; }
 
+    /* DOCUMENT VIEWER STYLING */
+    .doc-viewer-container {
+      width: 100%;
+      height: 650px;
+      border: 1px solid #1c2442;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+      margin-top: 15px;
+    }
+    .doc-viewer-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     /* ADMIN & ADD PERSON STYLES */
     .admin-panel { border-color: #ff4757; background: rgba(255, 71, 87, 0.03); }
     .admin-panel h2 { color: #ff4757; border-bottom-color: rgba(255, 71, 87, 0.3); }
@@ -112,16 +128,15 @@
 
       <!-- QUICK ACTION BUTTONS -->
       <div class="nav-actions">
-        <!-- Direct Link to your Google Doc -->
-        <a id="code-file-btn" class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
-          <h3>📄 Space Settlement PDF / Doc</h3>
-          <p id="code-file-subtitle">Click to open official Google Doc</p>
-        </a>
-        
         <a class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
-          <h3>✏️ Edit in Google Docs</h3>
-          <p>Live collaborative editing</p>
+          <h3>🔗 Open Document in New Tab</h3>
+          <p>Full Google Docs Editor View</p>
         </a>
+
+        <div class="action-card" onclick="scrollToSection('doc-viewer-section')">
+          <h3>📄 View Document Embedded</h3>
+          <p>Read clean preview inside dashboard</p>
+        </div>
 
         <div class="action-card" onclick="scrollToSection('schedule-section')">
           <h3>📅 Contest Schedule</h3>
@@ -146,15 +161,24 @@
         </div>
         <div id="admin-msg" class="error-msg" style="color:#2ed573; margin-bottom:15px;"></div>
 
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Document Link</h3>
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Embedded Document Link</h3>
         <div class="form-grid" style="grid-template-columns: 1fr auto;">
-          <input type="text" id="code-file-url" class="input-field" placeholder="Paste new Google Docs / Drive link..." style="margin:0;">
+          <input type="text" id="code-file-url" class="input-field" placeholder="Paste Google Docs link..." style="margin:0;">
           <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateFileLink()">Set Document Link</button>
         </div>
         <div id="file-link-msg" class="error-msg" style="color:#2ed573;"></div>
       </div>
 
-      <!-- 4. SCHEDULE & MILESTONES -->
+      <!-- 4. CLEAN EMBEDDED DOCUMENT VIEWER -->
+      <div id="doc-viewer-section" class="panel">
+        <h2>📄 Space Settlement Project Document</h2>
+        <p style="font-size:0.85rem; color:#a0a5c0;">Clean preview mode without Google Docs toolbars.</p>
+        <div class="doc-viewer-container">
+          <iframe id="doc-iframe" src="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/preview"></iframe>
+        </div>
+      </div>
+
+      <!-- 5. SCHEDULE & MILESTONES -->
       <div id="schedule-section" class="panel">
         <h2>📅 Project Schedule & Deadlines</h2>
         <table id="schedule-table">
@@ -189,7 +213,7 @@
         </table>
       </div>
 
-      <!-- 5. CHAPTER PROGRESS TRACKER -->
+      <!-- 6. CHAPTER PROGRESS TRACKER -->
       <div class="panel">
         <h2>📊 Chapter Progress</h2>
         <div class="progress-item">
@@ -206,7 +230,7 @@
         </div>
       </div>
 
-      <!-- 6. 3D MODELS SECTION -->
+      <!-- 7. 3D MODELS SECTION -->
       <div id="models-section" class="panel">
         <h2>🧊 3D Settlement CAD Views</h2>
         <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Interactive Tinkercad embeds and station layout schematics.</p>
@@ -215,7 +239,7 @@
         </div>
       </div>
 
-      <!-- 7. REGISTERED TEAM ROSTER -->
+      <!-- 8. REGISTERED TEAM ROSTER -->
       <div class="panel">
         <h2>👥 Team Roster</h2>
         <table id="roster-table">
@@ -308,7 +332,7 @@
       renderRoster();
     }
 
-    // ADMIN: UPDATE FILE LINK
+    // ADMIN: UPDATE FILE LINK & AUTOMATICALLY CONVERT TO PREVIEW FORMAT
     function updateFileLink() {
       let linkInput = document.getElementById("code-file-url").value.trim();
       const msg = document.getElementById("file-link-msg");
@@ -319,16 +343,15 @@
         return;
       }
 
-      if (!linkInput.startsWith("http://") && !linkInput.startsWith("https://")) {
-        linkInput = "https://" + linkInput;
+      // Format Google Docs link to preview mode
+      if (linkInput.includes("/edit")) {
+        linkInput = linkInput.split("/edit")[0] + "/preview";
       }
 
-      const fileBtn = document.getElementById("code-file-btn");
-      fileBtn.href = linkInput;
+      document.getElementById("doc-iframe").src = linkInput;
 
       msg.style.color = "#2ed573";
-      msg.innerText = "Document link updated successfully!";
-      document.getElementById("code-file-subtitle").innerText = "Opens updated document link";
+      msg.innerText = "Clean embedded view updated successfully!";
     }
 
     // RENDER TEAM ROSTER
