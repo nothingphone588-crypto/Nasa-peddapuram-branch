@@ -84,6 +84,7 @@
 </head>
 <body>
 
+  <!-- 1. LOGIN SCREEN OVERLAY -->
   <div id="login-screen" class="overlay">
     <div class="login-card">
       <h2>AMARAVASSAM</h2>
@@ -95,6 +96,7 @@
     </div>
   </div>
 
+  <!-- 2. MAIN APP DASHBOARD -->
   <div id="app-content" class="hidden">
     
     <header class="navbar">
@@ -108,10 +110,11 @@
 
     <div class="container">
 
+      <!-- QUICK ACTION BUTTONS -->
       <div class="nav-actions">
-        <div class="action-card" onclick="openPdfViewer()">
-          <h3>📄 Space Settlement Document</h3>
-          <p>Read official contest submission</p>
+        <div class="action-card" onclick="scrollToSection('doc-section')">
+          <h3>📄 Code File / Document</h3>
+          <p>Read official project code & files</p>
         </div>
         
         <div class="action-card" id="google-docs-card" onclick="openGoogleDocs()">
@@ -130,6 +133,7 @@
         </div>
       </div>
 
+      <!-- 3. ADMIN PANEL (VISIBLE TO LEADER ONLY) -->
       <div id="admin-panel" class="panel admin-panel hidden">
         <h2>👑 Leader Command Panel</h2>
         
@@ -143,12 +147,23 @@
 
         <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Code File / Document Link</h3>
         <div class="form-grid" style="grid-template-columns: 1fr auto;">
-          <input type="text" id="code-file-url" class="input-field" placeholder="Paste Google Drive / Docs / File Link here..." style="margin:0;">
-          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateFileLink()">Set Code File Link</button>
+          <input type="text" id="code-file-url" class="input-field" placeholder="Paste Google Drive / Docs / GitHub link..." style="margin:0;">
+          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateFileLink()">Set File Link</button>
         </div>
         <div id="file-link-msg" class="error-msg" style="color:#2ed573;"></div>
       </div>
 
+      <!-- 4. DOCUMENT & CODE FILE VIEW SECTION -->
+      <div id="doc-section" class="panel">
+        <h2>📄 Code File & Project Document Viewer</h2>
+        <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Official space settlement code file viewer frame.</p>
+        <iframe id="doc-iframe" src="https://docs.google.com/document/u/0/?tof=true" style="width:100%; height:400px; border:1px solid #1c2442; border-radius:6px; background:#fff;"></iframe>
+        <div style="margin-top:10px;">
+          <a id="direct-doc-link" href="https://docs.google.com/document/" target="_blank" style="color:#00d4ff; font-size:0.85rem; text-decoration:none;">🔗 Open File directly in new tab</a>
+        </div>
+      </div>
+
+      <!-- 5. SCHEDULE & MILESTONES -->
       <div id="schedule-section" class="panel">
         <h2>📅 Project Schedule & Deadlines</h2>
         <table id="schedule-table">
@@ -183,6 +198,7 @@
         </table>
       </div>
 
+      <!-- 6. CHAPTER PROGRESS TRACKER -->
       <div class="panel">
         <h2>📊 Chapter Progress</h2>
         <div class="progress-item">
@@ -199,6 +215,7 @@
         </div>
       </div>
 
+      <!-- 7. 3D MODELS SECTION -->
       <div id="models-section" class="panel">
         <h2>🧊 3D Settlement CAD Views</h2>
         <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Interactive Tinkercad embeds and station layout schematics.</p>
@@ -207,6 +224,7 @@
         </div>
       </div>
 
+      <!-- 8. REGISTERED TEAM ROSTER -->
       <div class="panel">
         <h2>👥 Team Roster</h2>
         <table id="roster-table">
@@ -218,7 +236,8 @@
             </tr>
           </thead>
           <tbody id="roster-body">
-            </tbody>
+            <!-- Dynamically populated -->
+          </tbody>
         </table>
       </div>
 
@@ -231,10 +250,6 @@
       { name: "Leader", pass: "admin123", role: "Leader" },
       { name: "Member", pass: "space123", role: "Team Member" }
     ];
-
-    // CODE FILE / DOCUMENT LINK VARIABLE (Default fallback)
-    let activeCodeFileLink = ""; 
-    const GOOGLE_DOCS_URL = "https://docs.google.com/"; 
 
     let currentUser = null;
 
@@ -313,7 +328,9 @@
         return;
       }
 
-      activeCodeFileLink = linkInput;
+      document.getElementById("doc-iframe").src = linkInput;
+      document.getElementById("direct-doc-link").href = linkInput;
+
       msg.style.color = "#2ed573";
       msg.innerText = "Code file / document link updated successfully!";
     }
@@ -332,18 +349,8 @@
       });
     }
 
-    // BUTTON NAVIGATION ACTIONS
-    function openPdfViewer() {
-      if (!activeCodeFileLink) {
-        alert("No Code File link has been set yet by the Leader. Setting default viewer...");
-        window.open("https://docs.google.com/document/", '_blank');
-      } else {
-        window.open(activeCodeFileLink, '_blank');
-      }
-    }
-
     function openGoogleDocs() {
-      window.open(GOOGLE_DOCS_URL, '_blank');
+      window.open("https://docs.google.com/", '_blank');
     }
 
     function scrollToSection(id) {
