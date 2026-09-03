@@ -52,7 +52,7 @@
     .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
     
     /* NAV BUTTONS GRID */
-    .nav-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .nav-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
     .action-card {
       background: #0e1222; border: 1px solid #1c2442; padding: 20px; border-radius: 8px;
       text-align: center; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: inherit; display: block;
@@ -65,21 +65,30 @@
     .panel { background: #0e1222; border: 1px solid #1c2442; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
     .panel h2 { color: #00d4ff; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #1c2442; padding-bottom: 8px; }
 
-    /* DOCUMENT VIEWER STYLING */
-    .doc-viewer-container {
-      width: 100%;
-      height: 650px;
-      border: 1px solid #1c2442;
+    /* PDF PROMPT CARD */
+    .pdf-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #0e1222 0%, #171e38 100%);
+      border: 1px solid #00d4ff;
       border-radius: 8px;
-      overflow: hidden;
-      background: #000;
-      margin-top: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
     }
-    .doc-viewer-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .pdf-banner-text h3 { color: #00d4ff; font-size: 1.1rem; margin-bottom: 4px; }
+    .pdf-banner-text p { color: #a0a5c0; font-size: 0.85rem; }
+    .btn-pdf {
+      padding: 10px 20px;
+      background: #00d4ff;
+      color: #070913;
+      font-weight: bold;
+      border-radius: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: 0.2s ease;
     }
+    .btn-pdf:hover { background: #009ac2; color: #fff; }
 
     /* ADMIN & ADD PERSON STYLES */
     .admin-panel { border-color: #ff4757; background: rgba(255, 71, 87, 0.03); }
@@ -94,291 +103,4 @@
     /* PROGRESS BAR */
     .progress-item { margin-bottom: 12px; }
     .progress-labels { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px; }
-    .progress-track { width: 100%; height: 8px; background: #1c2442; border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; background: #00d4ff; border-radius: 4px; }
-  </style>
-</head>
-<body>
-
-  <!-- 1. LOGIN SCREEN OVERLAY -->
-  <div id="login-screen" class="overlay">
-    <div class="login-card">
-      <h2>AMARAVASSAM</h2>
-      <p>NSS Space Settlement Portal</p>
-      <input type="text" id="login-name" class="input-field" placeholder="Enter Name">
-      <input type="password" id="login-pass" class="input-field" placeholder="Enter Password">
-      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
-      <div id="login-error" class="error-msg"></div>
-    </div>
-  </div>
-
-  <!-- 2. MAIN APP DASHBOARD -->
-  <div id="app-content" class="hidden">
-    
-    <header class="navbar">
-      <div class="logo">🚀 AMARAVASSAM COMMAND CENTER</div>
-      <div class="user-info">
-        <span id="user-display">Name</span>
-        <span id="user-role-badge" class="badge">Role</span>
-        <button class="btn-small" onclick="logout()">Logout</button>
-      </div>
-    </header>
-
-    <div class="container">
-
-      <!-- QUICK ACTION BUTTONS -->
-      <div class="nav-actions">
-        <a class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
-          <h3>🔗 Open Document in New Tab</h3>
-          <p>Full Google Docs Editor View</p>
-        </a>
-
-        <div class="action-card" onclick="scrollToSection('doc-viewer-section')">
-          <h3>📄 View Document Embedded</h3>
-          <p>Read clean preview inside dashboard</p>
-        </div>
-
-        <div class="action-card" onclick="scrollToSection('schedule-section')">
-          <h3>📅 Contest Schedule</h3>
-          <p>Deadlines & meeting milestones</p>
-        </div>
-
-        <div class="action-card" onclick="scrollToSection('models-section')">
-          <h3>🧊 3D Tinkercad Models</h3>
-          <p>View interactive CAD renders</p>
-        </div>
-      </div>
-
-      <!-- 3. ADMIN PANEL (VISIBLE TO LEADER ONLY) -->
-      <div id="admin-panel" class="panel admin-panel hidden">
-        <h2>👑 Leader Command Panel</h2>
-        
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Add Team Member</h3>
-        <div class="form-grid">
-          <input type="text" id="new-user-name" class="input-field" placeholder="Person's Name" style="margin:0;">
-          <input type="password" id="new-user-pass" class="input-field" placeholder="Set Password" style="margin:0;">
-          <button class="btn-primary" style="background:#ff4757; color:#fff;" onclick="addPerson()">Add Person</button>
-        </div>
-        <div id="admin-msg" class="error-msg" style="color:#2ed573; margin-bottom:15px;"></div>
-
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Embedded Document Link</h3>
-        <div class="form-grid" style="grid-template-columns: 1fr auto;">
-          <input type="text" id="code-file-url" class="input-field" placeholder="Paste Google Docs link..." style="margin:0;">
-          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateFileLink()">Set Document Link</button>
-        </div>
-        <div id="file-link-msg" class="error-msg" style="color:#2ed573;"></div>
-      </div>
-
-      <!-- 4. CLEAN EMBEDDED DOCUMENT VIEWER -->
-      <div id="doc-viewer-section" class="panel">
-        <h2>📄 Space Settlement Project Document</h2>
-        <p style="font-size:0.85rem; color:#a0a5c0;">Clean preview mode without Google Docs toolbars.</p>
-        <div class="doc-viewer-container">
-          <iframe id="doc-iframe" src="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/preview"></iframe>
-        </div>
-      </div>
-
-      <!-- 5. SCHEDULE & MILESTONES -->
-      <div id="schedule-section" class="panel">
-        <h2>📅 Project Schedule & Deadlines</h2>
-        <table id="schedule-table">
-          <thead>
-            <tr>
-              <th>Task / Milestone</th>
-              <th>Assigned To</th>
-              <th>Deadline</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Life Support & Agriculture Draft</td>
-              <td>Team</td>
-              <td>Oct 15, 2026</td>
-              <td><span style="color:#eccc68;">In Progress</span></td>
-            </tr>
-            <tr>
-              <td>Tinkercad 3D Hull Render</td>
-              <td>Leader</td>
-              <td>Nov 01, 2026</td>
-              <td><span style="color:#2ed573;">Completed</span></td>
-            </tr>
-            <tr>
-              <td>Final Submission to NSS</td>
-              <td>All Members</td>
-              <td>Dec 10, 2026</td>
-              <td><span style="color:#ff4757;">Upcoming</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 6. CHAPTER PROGRESS TRACKER -->
-      <div class="panel">
-        <h2>📊 Chapter Progress</h2>
-        <div class="progress-item">
-          <div class="progress-labels"><span>Executive Summary & Structural Design</span><span>90%</span></div>
-          <div class="progress-track"><div class="progress-fill" style="width: 90%;"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-labels"><span>Life Support & Artificial Gravity</span><span>70%</span></div>
-          <div class="progress-track"><div class="progress-fill" style="width: 70%;"></div></div>
-        </div>
-        <div class="progress-item">
-          <div class="progress-labels"><span>Space Agriculture & Energy Systems</span><span>50%</span></div>
-          <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
-        </div>
-      </div>
-
-      <!-- 7. 3D MODELS SECTION -->
-      <div id="models-section" class="panel">
-        <h2>🧊 3D Settlement CAD Views</h2>
-        <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:15px;">Interactive Tinkercad embeds and station layout schematics.</p>
-        <div style="background:#070913; border:1px dashed #1c2442; height:200px; display:flex; align-items:center; justify-content:center; color:#7f8c8d; border-radius:6px;">
-          [ Embedded Tinkercad 3D Viewer Canvas ]
-        </div>
-      </div>
-
-      <!-- 8. REGISTERED TEAM ROSTER -->
-      <div class="panel">
-        <h2>👥 Team Roster</h2>
-        <table id="roster-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Access Level</th>
-            </tr>
-          </thead>
-          <tbody id="roster-body">
-            <!-- Dynamically populated -->
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  </div>
-
-  <script>
-    // DEFAULT ACCOUNTS DATA
-    const usersDatabase = [
-      { name: "Leader", pass: "admin123", role: "Leader" },
-      { name: "Member", pass: "space123", role: "Team Member" }
-    ];
-
-    let currentUser = null;
-
-    // LOGIN SYSTEM
-    function handleLogin() {
-      const nameInput = document.getElementById("login-name").value.trim();
-      const passInput = document.getElementById("login-pass").value.trim();
-      const errorDiv = document.getElementById("login-error");
-
-      const foundUser = usersDatabase.find(
-        u => u.name.toLowerCase() === nameInput.toLowerCase() && u.pass === passInput
-      );
-
-      if (foundUser) {
-        currentUser = foundUser;
-        errorDiv.innerText = "";
-        initializeDashboard();
-      } else {
-        errorDiv.innerText = "Invalid Name or Password.";
-      }
-    }
-
-    // INITIALIZE DASHBOARD PANELS
-    function initializeDashboard() {
-      document.getElementById("login-screen").classList.add("hidden");
-      document.getElementById("app-content").classList.remove("hidden");
-
-      document.getElementById("user-display").innerText = currentUser.name;
-      const badge = document.getElementById("user-role-badge");
-      const adminPanel = document.getElementById("admin-panel");
-
-      if (currentUser.role === "Leader") {
-        badge.innerText = "PROJECT LEADER";
-        badge.className = "badge badge-leader";
-        adminPanel.classList.remove("hidden");
-      } else {
-        badge.innerText = "TEAM MEMBER";
-        badge.className = "badge badge-member";
-        adminPanel.classList.add("hidden");
-      }
-
-      renderRoster();
-    }
-
-    // ADMIN: ADD PERSON FUNCTION
-    function addPerson() {
-      const name = document.getElementById("new-user-name").value.trim();
-      const pass = document.getElementById("new-user-pass").value.trim();
-      const msg = document.getElementById("admin-msg");
-
-      if (!name || !pass) {
-        msg.style.color = "#ff4757";
-        msg.innerText = "Please enter both name and password.";
-        return;
-      }
-
-      usersDatabase.push({ name: name, pass: pass, role: "Team Member" });
-      
-      document.getElementById("new-user-name").value = "";
-      document.getElementById("new-user-pass").value = "";
-      
-      msg.style.color = "#2ed573";
-      msg.innerText = `Successfully added ${name} to team accounts!`;
-      
-      renderRoster();
-    }
-
-    // ADMIN: UPDATE FILE LINK & AUTOMATICALLY CONVERT TO PREVIEW FORMAT
-    function updateFileLink() {
-      let linkInput = document.getElementById("code-file-url").value.trim();
-      const msg = document.getElementById("file-link-msg");
-
-      if (!linkInput) {
-        msg.style.color = "#ff4757";
-        msg.innerText = "Please paste a valid URL link.";
-        return;
-      }
-
-      // Format Google Docs link to preview mode
-      if (linkInput.includes("/edit")) {
-        linkInput = linkInput.split("/edit")[0] + "/preview";
-      }
-
-      document.getElementById("doc-iframe").src = linkInput;
-
-      msg.style.color = "#2ed573";
-      msg.innerText = "Clean embedded view updated successfully!";
-    }
-
-    // RENDER TEAM ROSTER
-    function renderRoster() {
-      const tbody = document.getElementById("roster-body");
-      tbody.innerHTML = "";
-      usersDatabase.forEach(u => {
-        const row = `<tr>
-          <td>${u.name}</td>
-          <td>${u.role}</td>
-          <td><span style="color:${u.role === 'Leader' ? '#ff4757' : '#2ed573'};">${u.role === 'Leader' ? 'Full Control' : 'Standard View'}</span></td>
-        </tr>`;
-        tbody.innerHTML += row;
-      });
-    }
-
-    function scrollToSection(id) {
-      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function logout() {
-      currentUser = null;
-      document.getElementById("login-name").value = "";
-      document.getElementById("login-pass").value = "";
-      document.getElementById("app-content").classList.add("hidden");
-      document.getElementById("login-screen").classList.remove("hidden");
-    }
-  </script>
-</body>
-</html>
+    .progress-track { width: 1
