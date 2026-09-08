@@ -4,500 +4,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NSS Space Settlement Portal</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b1120;
-            --sidebar-bg: #111827;
-            --card-bg: #1f2937;
-            --accent-blue: #2563eb;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #7c3aed;
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
-            --border-color: #374151;
-            --badge-green: #059669;
-            --badge-yellow: #d97706;
-            --badge-blue: #2563eb;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --bg-color: #0b0d17;
+            --card-bg: #15192b;
+            --accent-color: #00d2ff;
+            --text-color: #ffffff;
+            --text-muted: #8c93b0;
+            --border-color: #252b48;
         }
 
         body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
-            padding: 1.5rem 1rem;
+            min-height: 100vh;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            padding-left: 0.5rem;
-        }
-
-        .brand-icon {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .brand-text h2 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .brand-text p {
-            font-size: 0.75rem;
-            color: var(--accent-cyan);
-            font-weight: 600;
-        }
-
-        .nav-menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background-color: rgba(37, 99, 235, 0.15);
-            color: var(--accent-cyan);
-            font-weight: 600;
-        }
-
-        .nav-item i {
-            width: 20px;
-        }
-
-        /* Main Area */
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        /* Top Header Bar */
         header {
-            background-color: var(--sidebar-bg);
-            border-bottom: 1px solid var(--border-color);
+            background-color: var(--card-bg);
             padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            letter-spacing: 1px;
         }
 
-        .avatar {
-            width: 36px;
-            height: 36px;
-            background-color: var(--accent-purple);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        /* Content Sections */
-        .content {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
             width: 100%;
+            box-sizing: border-box;
         }
 
-        .tab-content {
-            display: none;
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
         }
 
-        .tab-content.active {
-            display: block;
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
         }
 
-        /* Metrics / Analytics Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 1.25rem;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-
-        .stat-info h4 {
-            font-size: 0.8rem;
+        .hero p {
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 1.1rem;
         }
 
-        .stat-info p {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-top: 0.2rem;
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
-        /* Section Container */
-        .panel-box {
+        .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-color);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        .section-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+        .section-box h2 {
+            margin-top: 0;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            font-size: 1.3rem;
         }
 
-        .panel-header h3 {
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Custom Table Design */
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
+            margin-top: 1rem;
         }
 
         th, td {
-            padding: 0.85rem 1rem;
+            text-align: left;
+            padding: 0.75rem;
             border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
         }
 
         th {
             color: var(--text-muted);
-            font-weight: 600;
         }
 
         .status-badge {
-            padding: 0.25rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-in-progress { background-color: rgba(217, 119, 6, 0.2); color: #fbbf24; }
-        .status-completed { background-color: rgba(5, 150, 105, 0.2); color: #34d399; }
-        .status-upcoming { background-color: rgba(37, 99, 235, 0.2); color: #60a5fa; }
-
-        .btn-action {
-            background-color: var(--accent-blue);
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
             font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: background-color 0.2s;
         }
 
-        .btn-action:hover {
-            background-color: #1d4ed8;
-        }
+        .status-in-progress { background: #3d2c00; color: #ffca28; }
+        .status-completed { background: #003314; color: #4caf50; }
+        .status-upcoming { background: #1a233a; color: #64b5f6; }
 
         .cad-placeholder {
-            height: 350px;
-            background-color: #111827;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
+            height: 300px;
+            background: #0d111d;
+            border: 1px dashed var(--border-color);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
             color: var(--text-muted);
+            border-radius: 6px;
         }
 
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-right: none; }
-            .nav-menu { flex-direction: row; overflow-x: auto; }
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #000;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- Left Sidebar Menu (nLearn Style) -->
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">n</div>
-            <div class="brand-text">
-                <h2>nLearn</h2>
-                <p>SPACE PORTAL</p>
-            </div>
+    <header>
+        <h1>🚀 COMMAND CENTER</h1>
+        <div id="user-info">
+            <span style="color: var(--text-muted);">NSS Space Settlement Portal</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h2>NSS Space Settlement Portal</h2>
+            <p>Peddapuram Branch Command Panel</p>
         </div>
 
-        <ul class="nav-menu">
-            <li class="nav-item active" onclick="switchTab('dashboard', this)">
-                <i class="fa-solid fa-chart-pie"></i> Dashboard
-            </li>
-            <li class="nav-item" onclick="switchTab('schedule', this)">
-                <i class="fa-solid fa-calendar-days"></i> Schedule & Tasks
-            </li>
-            <li class="nav-item" onclick="switchTab('documents', this)">
-                <i class="fa-solid fa-file-lines"></i> Project Proposal
-            </li>
-            <li class="nav-item" onclick="switchTab('cad', this)">
-                <i class="fa-solid fa-cube"></i> 3D CAD Renders
-            </li>
-        </ul>
-    </aside>
+        <div class="grid-cards">
+            <a href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank" class="card">
+                <h3>🚀 Go to PDF / Document</h3>
+                <p>Open full document directly in a new tab</p>
+            </a>
+            <a href="#schedule" class="card">
+                <h3>📅 Contest Schedule</h3>
+                <p>Deadlines & meeting milestones</p>
+            </a>
+            <a href="#cad-views" class="card">
+                <h3>🧊 3D Tinkercad Models</h3>
+                <p>View interactive CAD renders</p>
+            </a>
+        </div>
 
-    <!-- Main Content Area -->
-    <div class="main-wrapper">
-        <header>
-            <div>
-                <h2 style="font-size: 1.2rem;">Peddapuram Branch — NSS Command Center</h2>
+        <div class="section-box">
+            <h2>📄 NSS Project Space Settlement Document</h2>
+            <p>Click below to open and view the complete official proposal file.</p>
+            <a href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank" class="btn-primary">Go to PDF ➔</a>
+        </div>
+
+        <div class="section-box" id="schedule">
+            <h2>📅 Project Schedule & Deadlines</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task / Milestone</th>
+                        <th>Assigned To</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Life Support & Agriculture Draft</td>
+                        <td>Team</td>
+                        <td>Oct 15, 2026</td>
+                        <td><span class="status-badge status-in-progress">In Progress</span></td>
+                    </tr>
+                    <tr>
+                        <td>Tinkercad 3D Hull Render</td>
+                        <td>Leader</td>
+                        <td>Nov 01, 2026</td>
+                        <td><span class="status-badge status-completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Final Submission to NSS</td>
+                        <td>All Members</td>
+                        <td>Dec 10, 2026</td>
+                        <td><span class="status-badge status-upcoming">Upcoming</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-box" id="cad-views">
+            <h2>🧊 3D Settlement CAD Views</h2>
+            <div class="cad-placeholder">
+                [ Embedded Tinkercad 3D Viewer Canvas ]
             </div>
-            <div class="user-profile">
-                <div class="avatar">TL</div>
-                <div>
-                    <div style="font-weight: 600; font-size: 0.9rem;">Team Leader</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">NSS Space Settlement 2026</div>
-                </div>
-            </div>
-        </header>
-
-        <div class="content">
-
-            <!-- TAB 1: DASHBOARD -->
-            <div id="dashboard" class="tab-content active">
-                
-                <!-- Analytics Top Row -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa;">
-                            <i class="fa-solid fa-list-check"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h4>Total Milestones</h4>
-                            <p>3 Modules</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(5, 150, 105, 0.2); color: #34d399;">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h4>3D Render Status</h4>
-                            <p>100% Ready</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(217, 119, 6, 0.2); color: #fbbf24;">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h4>Next Target</h4>
-                            <p>Oct 15, 2026</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel-box">
-                    <div class="panel-header">
-                        <h3><i class="fa-solid fa-file-pdf" style="color: var(--accent-cyan);"></i> Proposal Document Shortcut</h3>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Access the official Google Docs space settlement manuscript directly from nLearn portal.</p>
-                    <a href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank" class="btn-action">
-                        Open Proposal Doc <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                </div>
-
-                <div class="panel-box">
-                    <div class="panel-header">
-                        <h3><i class="fa-solid fa-tasks" style="color: var(--accent-purple);"></i> Active Project Timeline</h3>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Milestone</th>
-                                <th>Owner</th>
-                                <th>Deadline</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Life Support & Agriculture Draft</td>
-                                <td>Team</td>
-                                <td>Oct 15, 2026</td>
-                                <td><span class="status-badge status-in-progress">In Progress</span></td>
-                            </tr>
-                            <tr>
-                                <td>Tinkercad 3D Hull Render</td>
-                                <td>Leader</td>
-                                <td>Nov 01, 2026</td>
-                                <td><span class="status-badge status-completed">Completed</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 2: SCHEDULE -->
-            <div id="schedule" class="tab-content">
-                <div class="panel-box">
-                    <div class="panel-header">
-                        <h3><i class="fa-solid fa-calendar-check"></i> Milestone Schedule</h3>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Task / Milestone</th>
-                                <th>Assigned To</th>
-                                <th>Deadline</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Life Support & Agriculture Draft</td>
-                                <td>Team</td>
-                                <td>Oct 15, 2026</td>
-                                <td><span class="status-badge status-in-progress">In Progress</span></td>
-                            </tr>
-                            <tr>
-                                <td>Tinkercad 3D Hull Render</td>
-                                <td>Leader</td>
-                                <td>Nov 01, 2026</td>
-                                <td><span class="status-badge status-completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>Final Submission to NSS</td>
-                                <td>All Members</td>
-                                <td>Dec 10, 2026</td>
-                                <td><span class="status-badge status-upcoming">Upcoming</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 3: DOCUMENTS -->
-            <div id="documents" class="tab-content">
-                <div class="panel-box">
-                    <div class="panel-header">
-                        <h3><i class="fa-solid fa-book-open"></i> Project Proposal File</h3>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
-                        View and collaborate on the official NSS Space Settlement manuscript for the Peddapuram branch.
-                    </p>
-                    <a href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank" class="btn-action">
-                        Open in Google Docs <i class="fa-solid fa-external-link"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- TAB 4: 3D CAD -->
-            <div id="cad" class="tab-content">
-                <div class="panel-box">
-                    <div class="panel-header">
-                        <h3><i class="fa-solid fa-cubes"></i> Tinkercad 3D Hull Render</h3>
-                    </div>
-                    <div class="cad-placeholder">
-                        <i class="fa-solid fa-cube" style="font-size: 3rem; color: var(--accent-cyan);"></i>
-                        <p>Interactive Tinkercad Canvas View</p>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <script>
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            document.getElementById(tabId).classList.add('active');
-            element.classList.add('active');
-        }
-    </script>
 </body>
-  </html>
-  
+</html>
