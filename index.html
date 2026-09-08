@@ -1,265 +1,503 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AMARAVASSAM | Space Settlement Command Center</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    body { background: #070913; color: #e0e6ed; min-height: 100vh; display: flex; flex-direction: column; }
-    
-    .hidden { display: none !important; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSS Space Settlement Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b1120;
+            --sidebar-bg: #111827;
+            --card-bg: #1f2937;
+            --accent-blue: #2563eb;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #7c3aed;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --badge-green: #059669;
+            --badge-yellow: #d97706;
+            --badge-blue: #2563eb;
+        }
 
-    /* LOGIN MODAL */
-    .overlay {
-      position: fixed; inset: 0; background: radial-gradient(circle at center, #13172e 0%, #030408 100%);
-      display: flex; align-items: center; justify-content: center; z-index: 1000;
-    }
-    .login-card {
-      background: rgba(18, 24, 43, 0.95); border: 1px solid #00d4ff; border-radius: 12px;
-      padding: 35px; width: 340px; text-align: center; box-shadow: 0 0 25px rgba(0, 212, 255, 0.25);
-    }
-    .login-card h2 { color: #00d4ff; margin-bottom: 5px; font-size: 1.4rem; letter-spacing: 2px; }
-    .login-card p { color: #7f8c8d; margin-bottom: 20px; font-size: 0.85rem; }
-    .input-field {
-      width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0e1a; border: 1px solid #232d4b;
-      color: #fff; border-radius: 6px; outline: none;
-    }
-    .input-field:focus { border-color: #00d4ff; }
-    .btn-primary {
-      width: 100%; padding: 12px; background: #00d4ff; border: none; color: #070913;
-      font-weight: bold; border-radius: 6px; cursor: pointer;
-    }
-    .btn-primary:hover { background: #009ac2; color: #fff; }
-    .error-msg { color: #ff4757; font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-    /* NAVBAR */
-    .navbar {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 15px 30px; background: #0e1222; border-bottom: 1px solid #1c2442;
-    }
-    .logo { font-size: 1.2rem; font-weight: bold; color: #00d4ff; }
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-    .badge-leader { background: #ff4757; color: #fff; }
-    .badge-member { background: #2ed573; color: #000; }
-    .btn-small { padding: 6px 12px; background: #232d4b; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    /* DASHBOARD CONTENT */
-    .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
-    .nav-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
-    .action-card {
-      background: #0e1222; border: 1px solid #1c2442; padding: 20px; border-radius: 8px;
-      text-align: center; cursor: pointer; text-decoration: none; color: inherit; display: block;
-    }
-    .action-card:hover { border-color: #00d4ff; transform: translateY(-3px); }
-    .action-card h3 { font-size: 1rem; color: #00d4ff; margin-bottom: 5px; }
-    .action-card p { font-size: 0.75rem; color: #a0a5c0; }
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+        }
 
-    .pdf-banner {
-      display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(135deg, #0e1222 0%, #171e38 100%);
-      border: 1px solid #00d4ff; border-radius: 8px; padding: 20px; margin-bottom: 25px;
-    }
-    .pdf-banner-text h3 { color: #00d4ff; font-size: 1.1rem; margin-bottom: 4px; }
-    .pdf-banner-text p { color: #a0a5c0; font-size: 0.85rem; }
-    .btn-pdf {
-      padding: 10px 20px; background: #00d4ff; color: #070913;
-      font-weight: bold; border-radius: 6px; text-decoration: none; white-space: nowrap;
-    }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-left: 0.5rem;
+        }
 
-    .panel { background: #0e1222; border: 1px solid #1c2442; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
-    .panel h2 { color: #00d4ff; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #1c2442; padding-bottom: 8px; }
+        .brand-icon {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
 
-    .admin-panel { border-color: #ff4757; background: rgba(255, 71, 87, 0.03); }
-    .admin-panel h2 { color: #ff4757; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; }
+        .brand-text h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1c2442; }
-    th { color: #00d4ff; }
-  </style>
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(37, 99, 235, 0.15);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 20px;
+        }
+
+        /* Main Area */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Top Header Bar */
+        header {
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Content Sections */
+        .content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Metrics / Analytics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-info h4 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-info p {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+        }
+
+        /* Section Container */
+        .panel-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .panel-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Custom Table Design */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-in-progress { background-color: rgba(217, 119, 6, 0.2); color: #fbbf24; }
+        .status-completed { background-color: rgba(5, 150, 105, 0.2); color: #34d399; }
+        .status-upcoming { background-color: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+
+        .btn-action {
+            background-color: var(--accent-blue);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: #1d4ed8;
+        }
+
+        .cad-placeholder {
+            height: 350px;
+            background-color: #111827;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; }
+            .nav-menu { flex-direction: row; overflow-x: auto; }
+        }
+    </style>
 </head>
 <body>
 
-  <div id="login-screen" class="overlay">
-    <div class="login-card">
-      <h2>AMARAVASSAM</h2>
-      <p>NSS Space Settlement Portal</p>
-      <input type="text" id="login-name" class="input-field" placeholder="Enter Name">
-      <input type="password" id="login-pass" class="input-field" placeholder="Enter Password">
-      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
-      <div id="login-error" class="error-msg"></div>
+    <!-- Left Sidebar Menu (nLearn Style) -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">n</div>
+            <div class="brand-text">
+                <h2>nLearn</h2>
+                <p>SPACE PORTAL</p>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="switchTab('dashboard', this)">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </li>
+            <li class="nav-item" onclick="switchTab('schedule', this)">
+                <i class="fa-solid fa-calendar-days"></i> Schedule & Tasks
+            </li>
+            <li class="nav-item" onclick="switchTab('documents', this)">
+                <i class="fa-solid fa-file-lines"></i> Project Proposal
+            </li>
+            <li class="nav-item" onclick="switchTab('cad', this)">
+                <i class="fa-solid fa-cube"></i> 3D CAD Renders
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header>
+            <div>
+                <h2 style="font-size: 1.2rem;">Peddapuram Branch — NSS Command Center</h2>
+            </div>
+            <div class="user-profile">
+                <div class="avatar">TL</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">Team Leader</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">NSS Space Settlement 2026</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="dashboard" class="tab-content active">
+                
+                <!-- Analytics Top Row -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa;">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Total Milestones</h4>
+                            <p>3 Modules</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(5, 150, 105, 0.2); color: #34d399;">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>3D Render Status</h4>
+                            <p>100% Ready</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(217, 119, 6, 0.2); color: #fbbf24;">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Next Target</h4>
+                            <p>Oct 15, 2026</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-file-pdf" style="color: var(--accent-cyan);"></i> Proposal Document Shortcut</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Access the official Google Docs space settlement manuscript directly from nLearn portal.</p>
+                    <a href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank" class="btn-action">
+                        Open Proposal Doc <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-tasks" style="color: var(--accent-purple);"></i> Active Project Timeline</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Milestone</th>
+                                <th>Owner</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Life Support & Agriculture Draft</td>
+                                <td>Team</td>
+                                <td>Oct 15, 2026</td>
+                                <td><span class="status-badge status-in-progress">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td>Tinkercad 3D Hull Render</td>
+                                <td>Leader</td>
+                                <td>Nov 01, 2026</td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: SCHEDULE -->
+            <div id="schedule" class="tab-content">
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-calendar-check"></i> Milestone Schedule</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task / Milestone</th>
+                                <th>Assigned To</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Life Support & Agriculture Draft</td>
+                                <td>Team</td>
+                                <td>Oct 15, 2026</td>
+                                <td><span class="status-badge status-in-progress">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td>Tinkercad 3D Hull Render</td>
+                                <td>Leader</td>
+                                <td>Nov 01, 2026</td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Final Submission to NSS</td>
+                                <td>All Members</td>
+                                <td>Dec 10, 2026</td>
+                                <td><span class="status-badge status-upcoming">Upcoming</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: DOCUMENTS -->
+            <div id="documents" class="tab-content">
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-book-open"></i> Project Proposal File</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                        View and collaborate on the official NSS Space Settlement manuscript for the Peddapuram branch.
+                    </p>
+                    <a href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank" class="btn-action">
+                        Open in Google Docs <i class="fa-solid fa-external-link"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- TAB 4: 3D CAD -->
+            <div id="cad" class="tab-content">
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-cubes"></i> Tinkercad 3D Hull Render</h3>
+                    </div>
+                    <div class="cad-placeholder">
+                        <i class="fa-solid fa-cube" style="font-size: 3rem; color: var(--accent-cyan);"></i>
+                        <p>Interactive Tinkercad Canvas View</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-  </div>
 
-  <div id="app-content" class="hidden">
-    <header class="navbar">
-      <div class="logo">🚀 AMARAVASSAM COMMAND CENTER</div>
-      <div class="user-info">
-        <span id="user-display">Name</span>
-        <span id="user-role-badge" class="badge">Role</span>
-        <button class="btn-small" onclick="logout()">Logout</button>
-      </div>
-    </header>
+    <script>
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
 
-    <div class="container">
-      <div class="nav-actions">
-        <a id="main-pdf-btn" class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
-          <h3>🚀 Go to PDF / Document</h3>
-          <p>Open full document directly in new tab</p>
-        </a>
-        <div class="action-card" onclick="scrollToSection('schedule-section')">
-          <h3>📅 Contest Schedule</h3>
-          <p>Deadlines & meeting milestones</p>
-        </div>
-        <div class="action-card" onclick="scrollToSection('models-section')">
-          <h3>🧊 3D Tinkercad Models</h3>
-          <p>View interactive CAD renders</p>
-        </div>
-      </div>
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
 
-      <div class="pdf-banner">
-        <div class="pdf-banner-text">
-          <h3>📄 NSS Project Space Settlement Document</h3>
-          <p>Click below to open and view the complete official proposal file.</p>
-        </div>
-        <a id="banner-pdf-link" class="btn-pdf" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">Go to PDF ➔</a>
-      </div>
-
-      <div id="admin-panel" class="panel admin-panel hidden">
-        <h2>👑 Leader Command Panel</h2>
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Add Team Member</h3>
-        <div class="form-grid">
-          <input type="text" id="new-user-name" class="input-field" placeholder="Person's Name" style="margin:0;">
-          <input type="password" id="new-user-pass" class="input-field" placeholder="Set Password" style="margin:0;">
-          <button class="btn-primary" style="background:#ff4757; color:#fff;" onclick="addPerson()">Add Person</button>
-        </div>
-        <div id="admin-msg" class="error-msg" style="color:#2ed573; margin-bottom:15px;"></div>
-      </div>
-
-      <div id="schedule-section" class="panel">
-        <h2>📅 Project Schedule & Deadlines</h2>
-        <table>
-          <thead>
-            <tr><th>Task / Milestone</th><th>Assigned To</th><th>Deadline</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Life Support & Agriculture Draft</td><td>Team</td><td>Oct 15, 2026</td><td><span style="color:#eccc68;">In Progress</span></td></tr>
-            <tr><td>Tinkercad 3D Hull Render</td><td>Leader</td><td>Nov 01, 2026</td><td><span style="color:#2ed573;">Completed</span></td></tr>
-            <tr><td>Final Submission to NSS</td><td>All Members</td><td>Dec 10, 2026</td><td><span style="color:#ff4757;">Upcoming</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div id="models-section" class="panel">
-        <h2>🧊 3D Settlement CAD Views</h2>
-        <div style="background:#070913; border:1px dashed #1c2442; height:150px; display:flex; align-items:center; justify-content:center; color:#7f8c8d; border-radius:6px;">
-          [ Embedded Tinkercad 3D Viewer Canvas ]
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>👥 Team Roster</h2>
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Role</th><th>Access Level</th></tr>
-          </thead>
-          <tbody id="roster-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const usersDatabase = [
-      { name: "Leader", pass: "admin123", role: "Leader" },
-      { name: "Member", pass: "space123", role: "Team Member" }
-    ];
-
-    let currentUser = null;
-
-    function handleLogin() {
-      const nameInput = document.getElementById("login-name").value.trim();
-      const passInput = document.getElementById("login-pass").value.trim();
-      const errorDiv = document.getElementById("login-error");
-
-      const foundUser = usersDatabase.find(
-        u => u.name.toLowerCase() === nameInput.toLowerCase() && u.pass === passInput
-      );
-
-      if (foundUser) {
-        currentUser = foundUser;
-        errorDiv.innerText = "";
-        initializeDashboard();
-      } else {
-        errorDiv.innerText = "Invalid Name or Password.";
-      }
-    }
-
-    function initializeDashboard() {
-      document.getElementById("login-screen").classList.add("hidden");
-      document.getElementById("app-content").classList.remove("hidden");
-
-      document.getElementById("user-display").innerText = currentUser.name;
-      const badge = document.getElementById("user-role-badge");
-      const adminPanel = document.getElementById("admin-panel");
-
-      if (currentUser.role === "Leader") {
-        badge.innerText = "PROJECT LEADER";
-        badge.className = "badge badge-leader";
-        adminPanel.classList.remove("hidden");
-      } else {
-        badge.innerText = "TEAM MEMBER";
-        badge.className = "badge badge-member";
-        adminPanel.classList.add("hidden");
-      }
-
-      renderRoster();
-    }
-
-    function addPerson() {
-      const name = document.getElementById("new-user-name").value.trim();
-      const pass = document.getElementById("new-user-pass").value.trim();
-      const msg = document.getElementById("admin-msg");
-
-      if (!name || !pass) {
-        msg.style.color = "#ff4757";
-        msg.innerText = "Please enter both name and password.";
-        return;
-      }
-
-      usersDatabase.push({ name: name, pass: pass, role: "Team Member" });
-      document.getElementById("new-user-name").value = "";
-      document.getElementById("new-user-pass").value = "";
-      msg.style.color = "#2ed573";
-      msg.innerText = `Successfully added ${name}!`;
-      renderRoster();
-    }
-
-    function renderRoster() {
-      const tbody = document.getElementById("roster-body");
-      tbody.innerHTML = "";
-      usersDatabase.forEach(u => {
-        tbody.innerHTML += `<tr>
-          <td>${u.name}</td>
-          <td>${u.role}</td>
-          <td><span style="color:${u.role === 'Leader' ? '#ff4757' : '#2ed573'};">${u.role === 'Leader' ? 'Full Control' : 'Standard View'}</span></td>
-        </tr>`;
-      });
-    }
-
-    function scrollToSection(id) {
-      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function logout() {
-      currentUser = null;
-      document.getElementById("login-name").value = "";
-      document.getElementById("login-pass").value = "";
-      document.getElementById("app-content").classList.add("hidden");
-      document.getElementById("login-screen").classList.remove("hidden");
-    }
-  </script>
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+    </script>
 </body>
-</html>
+  </html>
+  
