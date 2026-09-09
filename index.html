@@ -139,6 +139,10 @@
           <h3>🚀 Go to PDF / Document</h3>
           <p>Open full document directly in new tab</p>
         </a>
+        <a id="main-last-year-btn" class="action-card last-year-link-target" href="#" target="_blank">
+          <h3>📁 Last Year Project</h3>
+          <p>View previous submission enterprise files</p>
+        </a>
         <div class="action-card" onclick="scrollToSection('schedule-section')">
           <h3>📅 Contest Schedule</h3>
           <p>Deadlines & meeting milestones</p>
@@ -149,12 +153,22 @@
         </div>
       </div>
 
+      <!-- CURRENT DOCUMENT BANNER -->
       <div class="pdf-banner">
         <div class="pdf-banner-text">
           <h3>📄 NSS Project Space Settlement Document</h3>
           <p>Click below to open and view the complete official proposal file.</p>
         </div>
         <a id="banner-pdf-link" class="btn-pdf pdf-link-target" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">Go to PDF ➔</a>
+      </div>
+
+      <!-- LAST YEAR PROJECT BANNER -->
+      <div class="pdf-banner" style="border-color: #eccc68; background: linear-gradient(135deg, #0e1222 0%, #252014 100%);">
+        <div class="pdf-banner-text">
+          <h3 style="color: #eccc68;">🏛️ Last Year Project & Enterprise Archive</h3>
+          <p>Access reference documents, enterprise designs, and research from last year's entry.</p>
+        </div>
+        <a id="banner-last-year-link" class="btn-pdf last-year-link-target" style="background: #eccc68; color: #070913;" href="#" target="_blank">Open Last Year Project ➔</a>
       </div>
 
       <!-- LEADER ADMIN PANEL -->
@@ -177,6 +191,14 @@
           <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updatePdfLink()">Update Link</button>
         </div>
         <div id="link-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
+
+        <!-- Last Year Enterprise Project Link Updater -->
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Last Year Project / Enterprise Link</h3>
+        <div class="link-form-grid">
+          <input type="text" id="last-year-url-input" class="input-field" placeholder="Paste Last Year Enterprise project link..." style="margin:0;">
+          <button class="btn-primary" style="background:#eccc68; color:#070913;" onclick="updateLastYearLink()">Update Enterprise Link</button>
+        </div>
+        <div id="last-year-link-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
 
         <!-- Add Team Member Form -->
         <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Add Team Member</h3>
@@ -229,11 +251,13 @@
 
     let currentUser = null;
     let currentPdfUrl = localStorage.getItem("custom_pdf_url") || "https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing";
+    let lastYearUrl = localStorage.getItem("custom_last_year_url") || "#";
     let currentProgress = localStorage.getItem("custom_project_progress") || "45";
 
-    // Load dynamic PDF link and progress on DOM load
+    // Load dynamic links and progress on DOM load
     window.addEventListener("DOMContentLoaded", () => {
       applyPdfUrl(currentPdfUrl);
+      applyLastYearUrl(lastYearUrl);
       applyProgress(currentProgress);
     });
 
@@ -288,6 +312,32 @@
 
       msg.style.color = "#2ed573";
       msg.innerText = "Document link updated successfully across the page!";
+    }
+
+    // LAST YEAR ENTERPRISE LINK FUNCTIONS
+    function applyLastYearUrl(url) {
+      document.querySelectorAll(".last-year-link-target").forEach(el => {
+        el.href = url;
+      });
+      document.getElementById("last-year-url-input").value = url === "#" ? "" : url;
+    }
+
+    function updateLastYearLink() {
+      const newUrl = document.getElementById("last-year-url-input").value.trim();
+      const msg = document.getElementById("last-year-link-msg");
+
+      if (!newUrl) {
+        msg.style.color = "#ff4757";
+        msg.innerText = "Please enter a valid enterprise link.";
+        return;
+      }
+
+      lastYearUrl = newUrl;
+      localStorage.setItem("custom_last_year_url", newUrl);
+      applyLastYearUrl(newUrl);
+
+      msg.style.color = "#2ed573";
+      msg.innerText = "Last Year enterprise project link updated successfully!";
     }
 
     // USER MANAGEMENT & DASHBOARD
