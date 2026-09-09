@@ -74,6 +74,7 @@
     .admin-panel { border-color: #ff4757; background: rgba(255, 71, 87, 0.03); }
     .admin-panel h2 { color: #ff4757; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; }
+    .link-form-grid { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 15px; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
     th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1c2442; }
@@ -82,6 +83,7 @@
 </head>
 <body>
 
+  <!-- LOGIN SCREEN -->
   <div id="login-screen" class="overlay">
     <div class="login-card">
       <h2>SPACE SETTLEMENT</h2>
@@ -93,6 +95,7 @@
     </div>
   </div>
 
+  <!-- MAIN APP CONTENT -->
   <div id="app-content" class="hidden">
     <header class="navbar">
       <div class="logo">🚀 SPACE SETTLEMENT COMMAND CENTER</div>
@@ -105,7 +108,7 @@
 
     <div class="container">
       <div class="nav-actions">
-        <a id="main-pdf-btn" class="action-card" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
+        <a id="main-pdf-btn" class="action-card pdf-link-target" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
           <h3>🚀 Go to PDF / Document</h3>
           <p>Open full document directly in new tab</p>
         </a>
@@ -124,11 +127,22 @@
           <h3>📄 NSS Project Space Settlement Document</h3>
           <p>Click below to open and view the complete official proposal file.</p>
         </div>
-        <a id="banner-pdf-link" class="btn-pdf" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">Go to PDF ➔</a>
+        <a id="banner-pdf-link" class="btn-pdf pdf-link-target" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">Go to PDF ➔</a>
       </div>
 
+      <!-- LEADER ADMIN PANEL -->
       <div id="admin-panel" class="panel admin-panel hidden">
         <h2>👑 Leader Command Panel</h2>
+        
+        <!-- Document URL Updater -->
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Document Link</h3>
+        <div class="link-form-grid">
+          <input type="text" id="pdf-url-input" class="input-field" placeholder="Paste new Google Docs / PDF Link here" style="margin:0;">
+          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updatePdfLink()">Update Link</button>
+        </div>
+        <div id="link-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
+
+        <!-- Add Team Member Form -->
         <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Add Team Member</h3>
         <div class="form-grid">
           <input type="text" id="new-user-name" class="input-field" placeholder="Person's Name" style="margin:0;">
@@ -178,6 +192,37 @@
     ];
 
     let currentUser = null;
+    let currentPdfUrl = localStorage.getItem("custom_pdf_url") || "https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing";
+
+    // Load dynamic PDF link on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      applyPdfUrl(currentPdfUrl);
+    });
+
+    function applyPdfUrl(url) {
+      document.querySelectorAll(".pdf-link-target").forEach(el => {
+        el.href = url;
+      });
+      document.getElementById("pdf-url-input").value = url;
+    }
+
+    function updatePdfLink() {
+      const newUrl = document.getElementById("pdf-url-input").value.trim();
+      const msg = document.getElementById("link-msg");
+
+      if (!newUrl) {
+        msg.style.color = "#ff4757";
+        msg.innerText = "Please enter a valid URL.";
+        return;
+      }
+
+      currentPdfUrl = newUrl;
+      localStorage.setItem("custom_pdf_url", newUrl);
+      applyPdfUrl(newUrl);
+
+      msg.style.color = "#2ed573";
+      msg.innerText = "Document link updated successfully across the page!";
+    }
 
     function handleLogin() {
       const nameInput = document.getElementById("login-name").value.trim();
