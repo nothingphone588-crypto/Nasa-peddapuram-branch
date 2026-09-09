@@ -56,6 +56,20 @@
     .action-card h3 { font-size: 1rem; color: #00d4ff; margin-bottom: 5px; }
     .action-card p { font-size: 0.75rem; color: #a0a5c0; }
 
+    /* PROGRESS BAR STYLES */
+    .progress-box {
+      background: #0e1222; border: 1px solid #1c2442; border-radius: 8px; padding: 20px; margin-bottom: 25px;
+    }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .progress-header h3 { font-size: 1rem; color: #00d4ff; }
+    .progress-percent { font-size: 1.2rem; font-weight: bold; color: #2ed573; }
+    .progress-track {
+      width: 100%; height: 16px; background: #070913; border-radius: 10px; overflow: hidden; border: 1px solid #1c2442;
+    }
+    .progress-fill {
+      height: 100%; width: 45%; background: linear-gradient(90deg, #00d4ff, #2ed573); transition: width 0.4s ease-in-out;
+    }
+
     .pdf-banner {
       display: flex; justify-content: space-between; align-items: center;
       background: linear-gradient(135deg, #0e1222 0%, #171e38 100%);
@@ -75,6 +89,7 @@
     .admin-panel h2 { color: #ff4757; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; }
     .link-form-grid { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 15px; }
+    .progress-control-grid { display: grid; grid-template-columns: 1fr 80px auto; gap: 10px; align-items: center; margin-bottom: 15px; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
     th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1c2442; }
@@ -107,6 +122,18 @@
     </header>
 
     <div class="container">
+
+      <!-- PROJECT PROGRESS BAR DISPLAY -->
+      <div class="progress-box">
+        <div class="progress-header">
+          <h3>📊 Overall Project Completion</h3>
+          <span id="progress-text" class="progress-percent">45%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-bar-fill" class="progress-fill"></div>
+        </div>
+      </div>
+
       <div class="nav-actions">
         <a id="main-pdf-btn" class="action-card pdf-link-target" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
           <h3>🚀 Go to PDF / Document</h3>
@@ -134,6 +161,15 @@
       <div id="admin-panel" class="panel admin-panel hidden">
         <h2>👑 Leader Command Panel</h2>
         
+        <!-- Project Progress Control -->
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Project Progress</h3>
+        <div class="progress-control-grid">
+          <input type="range" id="progress-slider" min="0" max="100" value="45" oninput="syncProgressInput(this.value)" style="accent-color:#00d4ff; cursor:pointer;">
+          <input type="number" id="progress-number" min="0" max="100" value="45" oninput="syncProgressSlider(this.value)" class="input-field" style="margin:0; text-align:center;">
+          <button class="btn-primary" style="background:#2ed573; color:#070913;" onclick="saveProgress()">Save Progress</button>
+        </div>
+        <div id="progress-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
+
         <!-- Document URL Updater -->
         <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Document Link</h3>
         <div class="link-form-grid">
@@ -193,12 +229,42 @@
 
     let currentUser = null;
     let currentPdfUrl = localStorage.getItem("custom_pdf_url") || "https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing";
+    let currentProgress = localStorage.getItem("custom_project_progress") || "45";
 
-    // Load dynamic PDF link on page load
+    // Load dynamic PDF link and progress on DOM load
     window.addEventListener("DOMContentLoaded", () => {
       applyPdfUrl(currentPdfUrl);
+      applyProgress(currentProgress);
     });
 
+    // PROGRESS BAR FUNCTIONS
+    function applyProgress(val) {
+      val = Math.min(100, Math.max(0, val));
+      document.getElementById("progress-bar-fill").style.width = val + "%";
+      document.getElementById("progress-text").innerText = val + "%";
+      document.getElementById("progress-slider").value = val;
+      document.getElementById("progress-number").value = val;
+    }
+
+    function syncProgressInput(val) {
+      document.getElementById("progress-number").value = val;
+    }
+
+    function syncProgressSlider(val) {
+      document.getElementById("progress-slider").value = val;
+    }
+
+    function saveProgress() {
+      const val = document.getElementById("progress-number").value;
+      applyProgress(val);
+      localStorage.setItem("custom_project_progress", val);
+      
+      const msg = document.getElementById("progress-msg");
+      msg.style.color = "#2ed573";
+      msg.innerText = `Project progress updated to ${val}%!`;
+    }
+
+    // PDF LINK FUNCTIONS
     function applyPdfUrl(url) {
       document.querySelectorAll(".pdf-link-target").forEach(el => {
         el.href = url;
@@ -224,6 +290,7 @@
       msg.innerText = "Document link updated successfully across the page!";
     }
 
+    // USER MANAGEMENT & DASHBOARD
     function handleLogin() {
       const nameInput = document.getElementById("login-name").value.trim();
       const passInput = document.getElementById("login-pass").value.trim();
