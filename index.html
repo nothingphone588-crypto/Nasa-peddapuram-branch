@@ -246,7 +246,7 @@
         <!-- 3D Model File Name Updater -->
         <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update 3D Model File Name</h3>
         <div class="link-form-grid">
-          <input type="text" id="model-url-input" class="input-field" placeholder="e.g. model.obj" style="margin:0;">
+          <input type="text" id="model-url-input" class="input-field" placeholder="e.g. model.glb" style="margin:0;">
           <button class="btn-primary" style="background:#00d4ff; color:#00d4ff;" onclick="updateModelUrl()">Update 3D Model</button>
         </div>
         <div id="model-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
@@ -288,10 +288,10 @@
       <div id="models-section" class="panel" style="position: relative;">
         <h2>🧊 3D Settlement CAD Views (Nomad Sculpt Cylinder Mesh)</h2>
         <div id="model-container" style="background:#070913; border:1px solid #1c2442; height:450px; border-radius:6px; overflow:hidden; margin-bottom: 15px;">
-          <!-- Native interactive 3D Web Component pointing to model.obj -->
+          <!-- Points directly to model.glb -->
           <model-viewer 
             id="cad-viewer"
-            src="model.obj" 
+            src="model.glb" 
             alt="Space Settlement 3D Model" 
             auto-rotate 
             camera-controls
@@ -323,7 +323,7 @@
     let lastYearUrl = localStorage.getItem("custom_last_year_url") || "#";
     let currentProgress = localStorage.getItem("custom_project_progress") || "45";
     let sharedNotes = localStorage.getItem("custom_shared_notepad") || "Welcome to the NASA Space Settlement shared notepad!";
-    let currentModelFile = localStorage.getItem("custom_model_file") || "model.obj";
+    let currentModelFile = localStorage.getItem("custom_model_file") || "model.glb";
 
     window.addEventListener("DOMContentLoaded", () => {
       applyPdfUrl(currentPdfUrl);
