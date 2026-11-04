@@ -71,9 +71,9 @@
     }
 
     .pdf-banner {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: center; position: relative;
       background: linear-gradient(135deg, #0e1222 0%, #171e38 100%);
-      border: 1px solid #00d4ff; border-radius: 8px; padding: 20px; margin-bottom: 25px;
+      border: 1px solid #00d4ff; border-radius: 8px; padding: 20px; padding-bottom: 35px; margin-bottom: 25px;
     }
     .pdf-banner-text h3 { color: #00d4ff; font-size: 1.1rem; margin-bottom: 4px; }
     .pdf-banner-text p { color: #a0a5c0; font-size: 0.85rem; }
@@ -81,6 +81,28 @@
       padding: 10px 20px; background: #00d4ff; color: #070913;
       font-weight: bold; border-radius: 6px; text-decoration: none; white-space: nowrap;
     }
+    
+    /* INTERACTIVE REVIEW LINK TAG */
+    .review-tag {
+      position: absolute; right: 20px; bottom: 8px; font-size: 0.75rem; color: #2ed573; font-weight: 600;
+      background: rgba(46, 213, 115, 0.1); padding: 3px 10px; border-radius: 4px; 
+      border: 1px solid rgba(46, 213, 115, 0.3); cursor: pointer; text-decoration: underline;
+    }
+    .review-tag:hover { background: rgba(46, 213, 115, 0.25); color: #fff; }
+
+    /* PREVIEW MODAL VIEWER */
+    .preview-modal {
+      position: fixed; inset: 0; background: rgba(3, 4, 8, 0.85); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 30px;
+    }
+    .preview-card {
+      background: #0e1222; border: 1px solid #00d4ff; border-radius: 10px; width: 100%; max-width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+    }
+    .preview-header {
+      display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #131a30; border-bottom: 1px solid #1c2442;
+    }
+    .preview-header h3 { color: #00d4ff; font-size: 1.1rem; }
+    .close-btn { background: #ff4757; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .preview-body { flex: 1; display: flex; flex-direction: column; padding: 15px; gap: 10px; overflow: hidden; }
 
     .panel { background: #0e1222; border: 1px solid #1c2442; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
     .panel h2 { color: #00d4ff; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #1c2442; padding-bottom: 8px; }
@@ -103,10 +125,27 @@
     <div class="login-card">
       <h2>SPACE SETTLEMENT</h2>
       <p>NSS Space Settlement Portal</p>
-      <input type="text" id="login-name" class="input-field" placeholder="Enter Name">
-      <input type="password" id="login-pass" class="input-field" placeholder="Enter Password">
+      <input type="text" id="login-name" class="input-field" placeholder="Username (leader)">
+      <input type="password" id="login-pass" class="input-field" placeholder="Password (admin123)">
       <button class="btn-primary" onclick="handleLogin()">Sign In</button>
       <div id="login-error" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- EMBEDDED PREVIEW MODAL (Hidden by default) -->
+  <div id="preview-modal-overlay" class="preview-modal hidden">
+    <div class="preview-card">
+      <div class="preview-header">
+        <h3 id="preview-title">Document Preview & Annotations</h3>
+        <button class="close-btn" onclick="closePreviewModal()">Close X</button>
+      </div>
+      <div class="preview-body">
+        <iframe id="preview-iframe" src="" style="width:100%; height:65vh; border:1px solid #232d4b; border-radius:6px; background:#fff;"></iframe>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="text" id="annotation-input" class="input-field" placeholder="Add custom review note / text directly to document viewer..." style="margin:0;">
+          <button class="btn-primary" style="width: auto; white-space: nowrap;" onclick="appendAnnotation()">Add Note</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -136,11 +175,11 @@
 
       <div class="nav-actions">
         <a id="main-pdf-btn" class="action-card pdf-link-target" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">
-          <h3>🚀 Go to PDF / Document</h3>
-          <p>Open full document directly in new tab</p>
+          <h3>🚀 Go to This Year's PDF</h3>
+          <p>Open full 2026 proposal document directly</p>
         </a>
         <a id="main-last-year-btn" class="action-card last-year-link-target" href="#" target="_blank">
-          <h3>📁 Last Year Project</h3>
+          <h3>📁 Last Year's Project</h3>
           <p>View previous submission enterprise files</p>
         </a>
         <div class="action-card" onclick="scrollToSection('schedule-section')">
@@ -153,22 +192,24 @@
         </div>
       </div>
 
-      <!-- CURRENT DOCUMENT BANNER -->
+      <!-- CURRENT DOCUMENT BANNER WITH INTERACTIVE PREVIEW LINK -->
       <div class="pdf-banner">
         <div class="pdf-banner-text">
-          <h3>📄 NSS Project Space Settlement Document</h3>
+          <h3>📄 NSS This Year's Project Space Settlement Document (2026)</h3>
           <p>Click below to open and view the complete official proposal file.</p>
         </div>
         <a id="banner-pdf-link" class="btn-pdf pdf-link-target" href="https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing" target="_blank">Go to PDF ➔</a>
+        <div class="review-tag" onclick="openPreview('This Year PDF (2026)', currentPdfUrl)">Review Status: Approved & Reviewed (Click to Preview)</div>
       </div>
 
-      <!-- LAST YEAR PROJECT BANNER -->
+      <!-- LAST YEAR PROJECT BANNER WITH INTERACTIVE PREVIEW LINK -->
       <div class="pdf-banner" style="border-color: #eccc68; background: linear-gradient(135deg, #0e1222 0%, #252014 100%);">
         <div class="pdf-banner-text">
-          <h3 style="color: #eccc68;">🏛️ Last Year Project & Enterprise Archive</h3>
+          <h3 style="color: #eccc68;">🏛️ Last Year's Project & Enterprise Archive (2025)</h3>
           <p>Access reference documents, enterprise designs, and research from last year's entry.</p>
         </div>
         <a id="banner-last-year-link" class="btn-pdf last-year-link-target" style="background: #eccc68; color: #070913;" href="#" target="_blank">Open Last Year Project ➔</a>
+        <div class="review-tag" style="color: #eccc68; background: rgba(236, 204, 104, 0.1); border-color: rgba(236, 204, 104, 0.3);" onclick="openPreview('Last Year PDF (2025)', lastYearUrl)">Review Status: Archived (Click to Preview)</div>
       </div>
 
       <!-- LEADER ADMIN PANEL -->
@@ -185,20 +226,28 @@
         <div id="progress-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
 
         <!-- Document URL Updater -->
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Document Link</h3>
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update This Year's PDF Link</h3>
         <div class="link-form-grid">
           <input type="text" id="pdf-url-input" class="input-field" placeholder="Paste new Google Docs / PDF Link here" style="margin:0;">
-          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updatePdfLink()">Update Link</button>
+          <button class="btn-primary" style="background:#00d4ff; color:#00d4ff;" onclick="updatePdfLink()">Update Link</button>
         </div>
         <div id="link-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
 
         <!-- Last Year Enterprise Project Link Updater -->
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Last Year Project / Enterprise Link</h3>
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update Last Year's PDF / Enterprise Link</h3>
         <div class="link-form-grid">
           <input type="text" id="last-year-url-input" class="input-field" placeholder="Paste Last Year Enterprise project link..." style="margin:0;">
           <button class="btn-primary" style="background:#eccc68; color:#070913;" onclick="updateLastYearLink()">Update Enterprise Link</button>
         </div>
         <div id="last-year-link-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
+
+        <!-- 3D Model Embed Updater -->
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update 3D Model Embed URL</h3>
+        <div class="link-form-grid">
+          <input type="text" id="model-url-input" class="input-field" placeholder="Paste embed URL here..." style="margin:0;">
+          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateModelUrl()">Update 3D Model</button>
+        </div>
+        <div id="model-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
 
         <!-- Add Team Member Form -->
         <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Add Team Member</h3>
@@ -208,6 +257,15 @@
           <button class="btn-primary" style="background:#ff4757; color:#fff;" onclick="addPerson()">Add Person</button>
         </div>
         <div id="admin-msg" class="error-msg" style="color:#2ed573; margin-bottom:15px;"></div>
+      </div>
+
+      <!-- SHARED NOTEPAD SECTION -->
+      <div id="notepad-section" class="panel">
+        <h2>📝 Shared Team Notepad</h2>
+        <p style="font-size:0.85rem; color:#a0a5c0; margin-bottom:10px;">Collaborative scratchpad for team notes and announcements.</p>
+        <textarea id="shared-notepad" class="input-field" rows="6" placeholder="Type shared notes here..." style="resize:vertical; background:#070913;"></textarea>
+        <button class="btn-primary" style="width:auto; padding:8px 16px;" onclick="saveNotepad()">Save Notepad</button>
+        <span id="notepad-msg" style="margin-left:10px; font-size:0.8rem; color:#2ed573;"></span>
       </div>
 
       <div id="schedule-section" class="panel">
@@ -224,11 +282,13 @@
         </table>
       </div>
 
-      <div id="models-section" class="panel">
-        <h2>🧊 3D Settlement CAD Views</h2>
-        <div style="background:#070913; border:1px dashed #1c2442; height:150px; display:flex; align-items:center; justify-content:center; color:#7f8c8d; border-radius:6px;">
-          [ Embedded Tinkercad 3D Viewer Canvas ]
+      <!-- 3D MODEL SECTION WITH PREVIEW LINK -->
+      <div id="models-section" class="panel" style="position: relative;">
+        <h2>🧊 3D Settlement CAD Views (Nomad Sculpt Cylinder Mesh)</h2>
+        <div id="model-container" style="background:#070913; border:1px solid #1c2442; height:400px; display:flex; align-items:center; justify-content:center; color:#7f8c8d; border-radius:6px; overflow:hidden; margin-bottom: 15px;">
+          <iframe id="cad-iframe" src="" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
         </div>
+        <div class="review-tag" style="position: static; display: inline-block;" onclick="openPreview('3D Model Structure', currentModelUrl)">Review Status: 3D Structure Checked (Click to Preview)</div>
       </div>
 
       <div class="panel">
@@ -245,7 +305,7 @@
 
   <script>
     const usersDatabase = [
-      { name: "Leader", pass: "admin123", role: "Leader" },
+      { name: "leader", pass: "admin123", role: "Leader" },
       { name: "Member", pass: "space123", role: "Team Member" }
     ];
 
@@ -253,15 +313,39 @@
     let currentPdfUrl = localStorage.getItem("custom_pdf_url") || "https://docs.google.com/document/d/1KOsyORPRIAX8YfkWSjOavsn6T7Jr_LTajQYPKqGdkNQ/edit?usp=sharing";
     let lastYearUrl = localStorage.getItem("custom_last_year_url") || "#";
     let currentProgress = localStorage.getItem("custom_project_progress") || "45";
+    let sharedNotes = localStorage.getItem("custom_shared_notepad") || "Welcome to the NASA Space Settlement shared notepad!";
+    let currentModelUrl = localStorage.getItem("custom_model_url") || "https://www.tinkercad.com/embed/YOUR_MODEL_ID_HERE";
 
-    // Load dynamic links and progress on DOM load
     window.addEventListener("DOMContentLoaded", () => {
       applyPdfUrl(currentPdfUrl);
       applyLastYearUrl(lastYearUrl);
       applyProgress(currentProgress);
+      applyModelUrl(currentModelUrl);
+      document.getElementById("shared-notepad").value = sharedNotes;
     });
 
-    // PROGRESS BAR FUNCTIONS
+    // MODAL PREVIEW FUNCTIONS
+    function openPreview(title, url) {
+      document.getElementById("preview-title").innerText = title;
+      document.getElementById("preview-iframe").src = url && url !== "#" ? url : "about:blank";
+      document.getElementById("preview-modal-overlay").classList.remove("hidden");
+    }
+
+    function closePreviewModal() {
+      document.getElementById("preview-modal-overlay").classList.add("hidden");
+      document.getElementById("preview-iframe").src = "";
+    }
+
+    function appendAnnotation() {
+      const text = document.getElementById("annotation-input").value.trim();
+      if (!text) return;
+      const notepad = document.getElementById("shared-notepad");
+      notepad.value += "\n[Review Note]: " + text;
+      saveNotepad();
+      document.getElementById("annotation-input").value = "";
+      alert("Note added successfully and synced to the Shared Notepad!");
+    }
+
     function applyProgress(val) {
       val = Math.min(100, Math.max(0, val));
       document.getElementById("progress-bar-fill").style.width = val + "%";
@@ -288,7 +372,14 @@
       msg.innerText = `Project progress updated to ${val}%!`;
     }
 
-    // PDF LINK FUNCTIONS
+    function saveNotepad() {
+      const notes = document.getElementById("shared-notepad").value;
+      localStorage.setItem("custom_shared_notepad", notes);
+      const msg = document.getElementById("notepad-msg");
+      msg.innerText = "Notepad saved successfully!";
+      setTimeout(() => { msg.innerText = ""; }, 2500);
+    }
+
     function applyPdfUrl(url) {
       document.querySelectorAll(".pdf-link-target").forEach(el => {
         el.href = url;
@@ -311,10 +402,9 @@
       applyPdfUrl(newUrl);
 
       msg.style.color = "#2ed573";
-      msg.innerText = "Document link updated successfully across the page!";
+      msg.innerText = "This year's document link updated successfully across the page!";
     }
 
-    // LAST YEAR ENTERPRISE LINK FUNCTIONS
     function applyLastYearUrl(url) {
       document.querySelectorAll(".last-year-link-target").forEach(el => {
         el.href = url;
@@ -337,10 +427,32 @@
       applyLastYearUrl(newUrl);
 
       msg.style.color = "#2ed573";
-      msg.innerText = "Last Year enterprise project link updated successfully!";
+      msg.innerText = "Last year's project link updated successfully!";
     }
 
-    // USER MANAGEMENT & DASHBOARD
+    function applyModelUrl(url) {
+      document.getElementById("cad-iframe").src = url;
+      document.getElementById("model-url-input").value = url.includes("YOUR_MODEL_ID_HERE") ? "" : url;
+    }
+
+    function updateModelUrl() {
+      const newUrl = document.getElementById("model-url-input").value.trim();
+      const msg = document.getElementById("model-msg");
+
+      if (!newUrl) {
+        msg.style.color = "#ff4757";
+        msg.innerText = "Please enter a valid embed URL.";
+        return;
+      }
+
+      currentModelUrl = newUrl;
+      localStorage.setItem("custom_model_url", newUrl);
+      applyModelUrl(newUrl);
+
+      msg.style.color = "#2ed573";
+      msg.innerText = "3D model embed updated successfully!";
+    }
+
     function handleLogin() {
       const nameInput = document.getElementById("login-name").value.trim();
       const passInput = document.getElementById("login-pass").value.trim();
@@ -355,7 +467,7 @@
         errorDiv.innerText = "";
         initializeDashboard();
       } else {
-        errorDiv.innerText = "Invalid Name or Password.";
+        errorDiv.innerText = "Invalid Username or Password (use leader / admin123).";
       }
     }
 
