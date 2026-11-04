@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Space Settlement Command Center</title>
+  <!-- Import the model-viewer component script -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #070913; color: #e0e6ed; min-height: 100vh; display: flex; flex-direction: column; }
@@ -187,7 +189,7 @@
           <p>Deadlines & meeting milestones</p>
         </div>
         <div class="action-card" onclick="scrollToSection('models-section')">
-          <h3>🧊 3D Tinkercad Models</h3>
+          <h3>🧊 3D Settlement Models</h3>
           <p>View interactive CAD renders</p>
         </div>
       </div>
@@ -241,11 +243,11 @@
         </div>
         <div id="last-year-link-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
 
-        <!-- 3D Model Embed Updater -->
-        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update 3D Model Embed URL</h3>
+        <!-- 3D Model File Name Updater -->
+        <h3 style="color:#00d4ff; font-size:1rem; margin-bottom:8px;">Update 3D Model File Name</h3>
         <div class="link-form-grid">
-          <input type="text" id="model-url-input" class="input-field" placeholder="Paste embed URL here..." style="margin:0;">
-          <button class="btn-primary" style="background:#00d4ff; color:#070913;" onclick="updateModelUrl()">Update 3D Model</button>
+          <input type="text" id="model-url-input" class="input-field" placeholder="e.g. model.obj" style="margin:0;">
+          <button class="btn-primary" style="background:#00d4ff; color:#00d4ff;" onclick="updateModelUrl()">Update 3D Model</button>
         </div>
         <div id="model-msg" class="error-msg" style="color:#2ed573; margin-bottom:20px;"></div>
 
@@ -276,19 +278,26 @@
           </thead>
           <tbody>
             <tr><td>Life Support & Agriculture Draft</td><td>Team</td><td>Oct 15, 2026</td><td><span style="color:#eccc68;">In Progress</span></td></tr>
-            <tr><td>Tinkercad 3D Hull Render</td><td>Leader</td><td>Nov 01, 2026</td><td><span style="color:#2ed573;">Completed</span></td></tr>
+            <tr><td>Nomad Sculpt Cylinder Mesh</td><td>Leader</td><td>Nov 01, 2026</td><td><span style="color:#2ed573;">Completed</span></td></tr>
             <tr><td>Final Submission to NSS</td><td>All Members</td><td>Dec 10, 2026</td><td><span style="color:#ff4757;">Upcoming</span></td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 3D MODEL SECTION WITH PREVIEW LINK -->
+      <!-- 3D MODEL SECTION USING MODEL-VIEWER -->
       <div id="models-section" class="panel" style="position: relative;">
         <h2>🧊 3D Settlement CAD Views (Nomad Sculpt Cylinder Mesh)</h2>
-        <div id="model-container" style="background:#070913; border:1px solid #1c2442; height:400px; display:flex; align-items:center; justify-content:center; color:#7f8c8d; border-radius:6px; overflow:hidden; margin-bottom: 15px;">
-          <iframe id="cad-iframe" src="" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
+        <div id="model-container" style="background:#070913; border:1px solid #1c2442; height:450px; border-radius:6px; overflow:hidden; margin-bottom: 15px;">
+          <!-- Native interactive 3D Web Component pointing to model.obj -->
+          <model-viewer 
+            id="cad-viewer"
+            src="model.obj" 
+            alt="Space Settlement 3D Model" 
+            auto-rotate 
+            camera-controls
+            style="width: 100%; height: 100%;">
+          </model-viewer>
         </div>
-        <div class="review-tag" style="position: static; display: inline-block;" onclick="openPreview('3D Model Structure', currentModelUrl)">Review Status: 3D Structure Checked (Click to Preview)</div>
       </div>
 
       <div class="panel">
@@ -314,13 +323,13 @@
     let lastYearUrl = localStorage.getItem("custom_last_year_url") || "#";
     let currentProgress = localStorage.getItem("custom_project_progress") || "45";
     let sharedNotes = localStorage.getItem("custom_shared_notepad") || "Welcome to the NASA Space Settlement shared notepad!";
-    let currentModelUrl = localStorage.getItem("custom_model_url") || "https://www.tinkercad.com/embed/YOUR_MODEL_ID_HERE";
+    let currentModelFile = localStorage.getItem("custom_model_file") || "model.obj";
 
     window.addEventListener("DOMContentLoaded", () => {
       applyPdfUrl(currentPdfUrl);
       applyLastYearUrl(lastYearUrl);
       applyProgress(currentProgress);
-      applyModelUrl(currentModelUrl);
+      applyModelFile(currentModelFile);
       document.getElementById("shared-notepad").value = sharedNotes;
     });
 
@@ -430,27 +439,27 @@
       msg.innerText = "Last year's project link updated successfully!";
     }
 
-    function applyModelUrl(url) {
-      document.getElementById("cad-iframe").src = url;
-      document.getElementById("model-url-input").value = url.includes("YOUR_MODEL_ID_HERE") ? "" : url;
+    function applyModelFile(filename) {
+      document.getElementById("cad-viewer").src = filename;
+      document.getElementById("model-url-input").value = filename;
     }
 
     function updateModelUrl() {
-      const newUrl = document.getElementById("model-url-input").value.trim();
+      const newFile = document.getElementById("model-url-input").value.trim();
       const msg = document.getElementById("model-msg");
 
-      if (!newUrl) {
+      if (!newFile) {
         msg.style.color = "#ff4757";
-        msg.innerText = "Please enter a valid embed URL.";
+        msg.innerText = "Please enter a valid file name.";
         return;
       }
 
-      currentModelUrl = newUrl;
-      localStorage.setItem("custom_model_url", newUrl);
-      applyModelUrl(newUrl);
+      currentModelFile = newFile;
+      localStorage.setItem("custom_model_file", newFile);
+      applyModelFile(newFile);
 
       msg.style.color = "#2ed573";
-      msg.innerText = "3D model embed updated successfully!";
+      msg.innerText = "3D model file updated successfully!";
     }
 
     function handleLogin() {
